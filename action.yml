@@ -93,6 +93,7 @@ runs:
             }
           }' -f projectId=$PROJECT_ID -F contentId=$PR_ID
         done
+      shell: bash
 branding:
   icon: activity
   color: purple
