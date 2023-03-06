@@ -5,7 +5,7 @@ inputs:
   usernames:
     description: 'A space separated list of usernames. Example: octocat mona-lisa'
     required: true
-  project:
+  project-id:
     description: 'The numerical ID of the project, typically found in the URL after "projects/" [organization-name]/projects/[project-id]'
     required: true
   organization:
@@ -15,9 +15,9 @@ inputs:
 runs:
   using: composite
   steps:
-    - id: get-project-id 
+    - id: get-project-node-id 
       run: | 
-        if ! echo "${{ inputs.project }}" | grep -Eq '^[0-9]+$'; then
+        if ! echo "${{ inputs.project-id }}" | grep -Eq '^[0-9]+$'; then
           echo "Error: project must be a number"
           exit 1
         fi
@@ -41,7 +41,7 @@ runs:
                 }
               }
             }
-          }'  -f org=${{ inputs.organization }} -F number=${{ inputs.project }} | jq -r '.data.organization.projectV2.id')
+          }'  -f org=${{ inputs.organization }} -F number=${{ inputs.project-id }} | jq -r '.data.organization.projectV2.id')
         echo '$PROJECT_ID: '$PROJECT_ID
         echo "PROJECT_ID=$PROJECT_ID" >> $GITHUB_ENV
       shell: bash
