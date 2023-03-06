@@ -23,7 +23,7 @@ To use this action, include the following code in your workflow file:
 - name: Add User PRs to a Project
   uses: aaronwaggener/add-prs@1.0.0
   with:
-    usernames: octocat mona-lisa
+    usernames: [space separated usernames]
     project-id: [project ID]
     organization: [organization name]
   env:
@@ -46,7 +46,7 @@ jobs:
       - name: Add the PRs to the project
         uses: aaronwaggener/add-prs@1.0.0
         with:
-          usernames: [space separated list of usernames]
+          usernames: octocat mona-lisa
           project-id: 123
           organization: org-name
         env:
