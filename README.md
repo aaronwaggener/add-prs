@@ -24,7 +24,7 @@ To use this action, include the following code in your workflow file:
   uses: aaronwaggener/add-prs
   with:
     usernames: octocat mona-lisa
-    project: [project ID]
+    project-id: [project ID]
     organization: [organization name]
   env:
     GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -47,7 +47,7 @@ jobs:
         uses: aaronwaggener/add-prs
         with:
           usernames: octocat mona-lisa
-          project: 123
+          project-id: 123
           organization: org-name
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
