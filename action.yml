@@ -93,3 +93,6 @@ runs:
             }
           }' -f projectId=$PROJECT_ID -F contentId=$PR_ID
         done
+branding:
+  icon: activity
+  color: purple
