@@ -1,6 +1,6 @@
 name: Add User Pull Requests to Project Board
 author: Aaron Waggener
-description: Given a list of usernames, an organization, and a project, add all open pull requests from usernames in organization to the project board.
+description: Add open pull requests that match an organization and list of usernames to a project board.
 inputs:
   usernames:
     description: 'A space separated list of usernames. Example: octocat mona-lisa'
