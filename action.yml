@@ -60,7 +60,7 @@ runs:
 
         PR_IDS=$(gh api graphql --paginate -F query="
         query(\$cursor: String){
-          search(first: 100, type: ISSUE, query: \"org:${{ inputs.organization }} is:pr is:open $USERNAMES_FORMATTED -is:draft\", after: \$cursor) {
+          search(first: 100, type: ISSUE, query: \"org:${{ inputs.organization }} is:pr is:open $USERNAMES_FORMATTED\", after: \$cursor) {
             pageInfo {
               hasNextPage
               endCursor
