@@ -21,29 +21,27 @@ runs:
           echo "Error: project must be a number"
           exit 1
         fi
-
         if [ -z "${{ inputs.organization }}" ]; then
           echo "Error: No organization provided"
           exit 1
         fi
-
-        PROJECT_ID=$(gh api graphql -f query='  
+        PROJECT_DATA=$(gh api graphql -f query='  
           query($org: String!, $number: Int!) {
             organization(login: $org){
               projectV2(number: $number) {
                 id
-                fields(first:20) {
-                  nodes {
-                    ... on ProjectV2Field {
-                      id
-                    }
-                  }
+                createdAtFieldId: field(name: "Created At") {
+                  id
                 }
               }
             }
-          }'  -f org=${{ inputs.organization }} -F number=${{ inputs.project-id }} | jq -r '.data.organization.projectV2.id')
-        echo '$PROJECT_ID: '$PROJECT_ID
+          }'  -f org=${{ inputs.organization }} -F number=${{ inputs.project-id }})
+
+        PROJECT_ID=$(echo $PROJECT_DATA | jq -r '.data.organization.projectV2.id')
+        CREATED_AT_FIELD_ID=$(echo $PROJECT_DATA | jq -r '.data.organization.projectV2.createdAtFieldId.id')
+
         echo "PROJECT_ID=$PROJECT_ID" >> $GITHUB_ENV
+        echo "CREATED_AT_FIELD_ID=$CREATED_AT_FIELD_ID" >> $GITHUB_ENV
       shell: bash
     - id: get-pr-ids
       run: | 
@@ -52,13 +50,11 @@ runs:
           USERNAMES_FORMATTED="${USERNAMES_FORMATTED}author:${username} "
         done
         USERNAMES_FORMATTED=${USERNAMES_FORMATTED%+}
-
         if [ -z "$USERNAMES_FORMATTED" ]; then
           echo "Error: No usernames provided"
           exit 1
         fi
-
-        PR_IDS=$(gh api graphql --paginate -F query="
+        PR_DATA=$(gh api graphql --paginate -F query="
         query(\$cursor: String){
           search(first: 100, type: ISSUE, query: \"org:${{ inputs.organization }} is:pr is:open $USERNAMES_FORMATTED\", after: \$cursor) {
             pageInfo {
@@ -69,29 +65,35 @@ runs:
               ... on PullRequest {
                 id
                 title
+                createdAt
               }
             }
           }
         }
-        " | jq -r '.data.search.nodes[] | .id' | tr -s [:space:] ',' | sed 's/,$//')
-        echo '$PR_IDS: '$PR_IDS
-        echo "PR_IDS=$PR_IDS" >> $GITHUB_ENV
+        " | jq -r '.data.search.nodes[] | {id: .id, title: .title, createdAt: .createdAt}')
+        echo "PR_DATA=$PR_DATA" >> $GITHUB_ENV
       shell: bash
     - id: add-prs-to-project
       run: |
         echo "project id: ${{ env.PROJECT_ID }}"
-        echo "pr ids: ${{ env.PR_IDS }}"
-        for PR_ID in ${PR_IDS//,/ }
-        do
-          echo "adding PR: $PR_ID to project: $PROJECT_ID"
+        echo "created at field id: ${{ env.CREATED_AT_FIELD_ID }}"
+        for PR_JSON in $(echo ${{ env.PR_DATA }} | jq -c '.[]'); do
+          PR_ID=$(echo $PR_JSON | jq -r '.id')
+          PR_CREATED_AT=$(echo $PR_JSON | jq -r '.createdAt')
+          echo "adding PR: $PR_ID to project: $PROJECT_ID with Created At: $PR_CREATED_AT"
           gh api graphql -f query='
-          mutation($projectId: ID!, $contentId: ID!) {
+          mutation($projectId: ID!, $contentId: ID!, $createdAtFieldId: ID!, $createdAt: DateTime!) {
             addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
               item {
                 id
               }
             }
-          }' -f projectId=$PROJECT_ID -F contentId=$PR_ID
+            updateProjectV2ItemDateField(input: {id: $createdAtFieldId, projectId: $projectId, value: $createdAt}) {
+              field {
+                id
+              }
+            }
+          }' -f projectId=$PROJECT_ID -F contentId=$PR_ID -F createdAtFieldId=$CREATED_AT_FIELD_ID -F createdAt=$PR_CREATED_AT
         done
       shell: bash
 branding:
