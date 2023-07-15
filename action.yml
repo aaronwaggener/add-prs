@@ -44,9 +44,11 @@ runs:
 
         PROJECT_ID=$(echo $PROJECT_DATA | jq -r '.data.organization.projectV2.id')
         CREATED_AT_FIELD_ID=$(echo $PROJECT_DATA | jq -r '.data.organization.projectV2.fields.nodes[] | select(.name == "Created At") | .id')
+        AUTHORED_BY_FIELD_ID=$(echo $PROJECT_DATA | jq -r '.data.organization.projectV2.fields.nodes[] | select(.name == "Authored By") | .id')
 
         echo "PROJECT_ID=$PROJECT_ID" >> $GITHUB_ENV
         echo "CREATED_AT_FIELD_ID=$CREATED_AT_FIELD_ID" >> $GITHUB_ENV
+        echo "AUTHORED_BY_FIELD_ID=$AUTHORED_BY_FIELD_ID" >> $GITHUB_ENV
       shell: bash
     - id: get-pr-ids
       run: | 
