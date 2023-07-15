@@ -72,6 +72,9 @@ runs:
               ... on PullRequest {
                 id
                 createdAt
+                author {
+                  login
+                }
               }
             }
           }
@@ -86,6 +89,7 @@ runs:
         for pr_info in $(cat $PR_DATA_FILE); do
           PR_ID=$(echo $pr_info | jq -r '.id')
           PR_CREATED_AT=$(echo $pr_info | jq -r '.createdAt')
+          PR_AUTHORED_BY=$(echo $pr_info | jq -r '"@" + .author.login')
           
           # Add PR to project
           ADD_PR_RESULT=$(gh api graphql -f query='
@@ -106,6 +110,14 @@ runs:
                 clientMutationId
               }
             }' -f item_id=$PR_ITEM_ID -f field_id=$CREATED_AT_FIELD_ID -f value=$PR_CREATED_AT -f project_id=$PROJECT_ID)
+
+          # Set custom Authored By field value
+          SET_AUTHORED_BY_RESULT=$(gh api graphql -f query='
+            mutation($item_id: ID!, $field_id: ID!, $value: String!, $project_id: ID!) {
+              updateProjectV2ItemFieldValue(input: {itemId: $item_id, fieldId: $field_id, value: {text: $value}, projectId: $project_id}) {
+                clientMutationId
+              }
+            }' -f item_id=$PR_ITEM_ID -f field_id=$AUTHORED_BY_FIELD_ID -f value=$PR_AUTHORED_BY -f project_id=$PROJECT_ID)
 
         done
       shell: bash
