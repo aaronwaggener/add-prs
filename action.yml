@@ -54,13 +54,14 @@ runs:
       run: | 
         USERNAMES_FORMATTED=""
         for username in ${{ inputs.usernames }}; do
-          USERNAMES_FORMATTED="${USERNAMES_FORMATTED}author:${username} "
+          USERNAMES_FORMATTED="${USERNAMES_FORMATTED}author:${username} OR "
         done
-        USERNAMES_FORMATTED=${USERNAMES_FORMATTED%+}
+        USERNAMES_FORMATTED=${USERNAMES_FORMATTED% OR }
         if [ -z "$USERNAMES_FORMATTED" ]; then
           echo "Error: No usernames provided"
           exit 1
         fi
+        USERNAMES_FORMATTED="(${USERNAMES_FORMATTED})"
         PR_DATA=$(gh api graphql --paginate -F query="
         query(\$cursor: String){
           search(first: 100, type: ISSUE, query: \"org:${{ inputs.organization }} is:pr is:open $USERNAMES_FORMATTED\", after: \$cursor) {
