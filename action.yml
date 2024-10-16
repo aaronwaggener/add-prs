@@ -64,9 +64,10 @@ runs:
         USERNAMES_FORMATTED="(${USERNAMES_FORMATTED})"
         SEARCH_QUERY="org:${{ inputs.organization }} is:pr is:open $USERNAMES_FORMATTED"
         echo "Search Query: $SEARCH_QUERY"
+        
         PR_DATA=$(gh api graphql --paginate -F query="
         query(\$cursor: String){
-          search(first: 100, type: ISSUE, query: \"org:${{ inputs.organization }} is:pr is:open $USERNAMES_FORMATTED\", after: \$cursor) {
+          search(first: 100, type: ISSUE, query: \"$SEARCH_QUERY\", after: \$cursor) {
             pageInfo {
               hasNextPage
               endCursor
@@ -84,6 +85,12 @@ runs:
         }
         " | jq -c '.data.search.nodes[]')
 
+        if [ -z "$PR_DATA" ]; then
+          echo "No PR data found"
+          exit 1
+        fi
+
+        echo "PR Data: $PR_DATA"
         echo "$PR_DATA" > pr_data.json
       shell: bash
     - id: add-prs-to-project
