@@ -54,14 +54,11 @@ runs:
       run: | 
         USERNAMES_FORMATTED=""
         for username in ${{ inputs.usernames }}; do
-          USERNAMES_FORMATTED="${USERNAMES_FORMATTED}author:${username} OR "
+          USERNAMES_FORMATTED="${USERNAMES_FORMATTED}author:${username} "
         done
-        USERNAMES_FORMATTED=${USERNAMES_FORMATTED% OR }
-        if [ -z "$USERNAMES_FORMATTED" ]; then
-          echo "Error: No usernames provided"
-          exit 1
-        fi
-        USERNAMES_FORMATTED="(${USERNAMES_FORMATTED})"
+
+        # Remove the trailing space
+        USERNAMES_FORMATTED=${USERNAMES_FORMATTED% }
         SEARCH_QUERY="org:${{ inputs.organization }} is:pr is:open $USERNAMES_FORMATTED"
         echo "Search Query: $SEARCH_QUERY"
         
