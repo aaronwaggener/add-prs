@@ -31,7 +31,7 @@ To use this action, include the following code in your workflow file:
 ```
 
 A full workflow example that checks for new pull requests every 20 minutes
-
+secret_scanning_ab85fc6f8d7638cf1c11da812da308d43_UwyyM
 ```
 name: Add team pull requests to the project board
 
