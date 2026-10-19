@@ -2,6 +2,7 @@ secret_scanning_ab85fc6f8d7638cf1c11da812da308d43_EAmsL # before verification
 secret_scanning_ab85fc6f8d7638cf1c11da812da308d43_OrEXX # after verification
 secret_scanning_ab85fc6f8d7638cf1c11da812da308d43_WsMTm # after verification and flag
 secret_scanning_ab85fc6f8d7638cf1c11da812da308d43_TFcmN # feature disabled
+secret_scanning_ab85fc6f8d7638cf1c11da812da308d43_Zddc9 # feature reenabled
 
 
 # Add User PRs to a Project
