@@ -1,3 +1,6 @@
+secret_scanning_ab85fc6f8d7638cf1c11da812da308d43_EAmsL # before verification
+
+
 # Add User PRs to a Project
 This GitHub Action adds all open pull requests in an organization that are authored by at least one of the supplied usernames to a project board.
 
